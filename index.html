@@ -3,40 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Upload and Classification</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <title>Image Classification</title>
 </head>
 <body>
-    <h1>Upload Image for Classification</h1>
-    <form id="uploadForm">
-        <input type="file" id="imageInput" accept="image/*" />
-        <button type="button" id="uploadButton">Upload Image</button>
+    <h1>Upload an Image for Classification</h1>
+    <form id="uploadForm" action="/.netlify/functions/classify" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" />
+        <button type="submit">Upload Image</button>
     </form>
     <div id="result"></div>
 
     <script>
-        document.getElementById('uploadButton').addEventListener('click', async function() {
-            const fileInput = document.getElementById('imageInput');
-            const file = fileInput.files[0];
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData
+            });
 
-            if (!file) {
-                alert('Please select an image.');
-                return;
-            }
+            const result = await response.json();
+            const predictions = result.predictions;
 
-            const img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            img.onload = async function() {
-                const model = await mobilenet.load();
-                const predictions = await model.classify(img);
-                document.getElementById('result').innerHTML = `
-                    <h2>Predictions:</h2>
-                    <ul>
-                        ${predictions.map(p => `<li>${p.className}: ${p.probability.toFixed(2)}</li>`).join('')}
-                    </ul>
-                `;
-            };
+            let output = '<h2>Predictions:</h2><ul>';
+            predictions.forEach(pred => {
+                output += `<li>${pred.className}: ${pred.probability.toFixed(3)}</li>`;
+            });
+            output += '</ul>';
+
+            document.getElementById('result').innerHTML = output;
         });
     </script>
 </body>
