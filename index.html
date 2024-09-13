@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Classification</title>
+    <title>Image Upload</title>
 </head>
 <body>
-    <h1>Upload an Image for Classification</h1>
+    <h1>Upload an Image</h1>
     <form id="uploadForm" action="/.netlify/functions/classify" method="post" enctype="multipart/form-data">
         <input type="file" name="file" accept="image/*" />
         <button type="submit">Upload Image</button>
@@ -23,7 +23,7 @@
             });
 
             const result = await response.json();
-            document.getElementById('result').innerHTML = `<h2>Predictions:</h2><ul>${result.predictions.map(pred => `<li>${pred.className}: ${pred.probability.toFixed(3)}</li>`).join('')}</ul>`;
+            document.getElementById('result').innerHTML = `<h2>Prediction:</h2><p>${result.prediction}</p>`;
         });
     </script>
 </body>
