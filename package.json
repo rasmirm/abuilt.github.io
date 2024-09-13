@@ -1,15 +1,12 @@
 {
-    "name": "image-classifier",
-    "version": "1.0.0",
-    "main": "index.js",
-    "scripts": {
-      "start": "netlify dev"
-    },
-    "dependencies": {
-      "@tensorflow/tfjs-node": "^3.0.0",
-      "@tensorflow-models/mobilenet": "^2.0.0",
-      "formidable": "^2.0.1",
-      "image-js": "^0.30.0"
-    }
+  "name": "netlify-function",
+  "version": "1.0.0",
+  "description": "Minimal Netlify function",
+  "main": "classify.js",
+  "scripts": {
+    "start": "netlify dev"
+  },
+  "dependencies": {
+    "formidable": "^2.0.1"
   }
-  
+}
