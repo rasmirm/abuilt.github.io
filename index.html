@@ -4,14 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Classification</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            width: 80%;
+            justify-content: space-between;
+        }
+        #image-container {
+            flex: 1;
+            margin-right: 20px;
+        }
+        #result {
+            flex: 1;
+        }
+        #uploadForm {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Upload an Image for Classification</h1>
+    <div class="container">
+        <div id="image-container">
+            <h2>Uploaded Image</h2>
+            <img id="uploaded-image" style="max-width: 100%; height: auto; display: none;" />
+        </div>
+        <div id="result">
+            <h2>Predictions</h2>
+            <div id="predictions"></div>
+        </div>
+    </div>
     <form id="uploadForm" action="/.netlify/functions/classify" method="post" enctype="multipart/form-data">
         <input type="file" name="file" accept="image/*" />
         <button type="submit">Upload Image</button>
     </form>
-    <div id="result"></div>
 
     <script>
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
@@ -22,16 +54,29 @@
                 body: formData
             });
 
+            if (!response.ok) {
+                console.error('Error:', response.statusText);
+                return;
+            }
+
             const result = await response.json();
             const predictions = result.predictions;
 
-            let output = '<h2>Predictions:</h2><ul>';
+            // Display the uploaded image
+            const fileInput = document.querySelector('input[type="file"]');
+            const file = fileInput.files[0];
+            const imgURL = URL.createObjectURL(file);
+            const uploadedImage = document.getElementById('uploaded-image');
+            uploadedImage.src = imgURL;
+            uploadedImage.style.display = 'block';
+
+            // Display predictions
+            let output = '<ul>';
             predictions.forEach(pred => {
                 output += `<li>${pred.className}: ${pred.probability.toFixed(3)}</li>`;
             });
             output += '</ul>';
-
-            document.getElementById('result').innerHTML = output;
+            document.getElementById('predictions').innerHTML = output;
         });
     </script>
 </body>
