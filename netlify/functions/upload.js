@@ -17,10 +17,17 @@ exports.handler = async function(event, context) {
             const file = files.file[0];
             try {
                 const fileContent = await readFile(file.filepath);
-                // Process the PDF content here
-                resolve({ statusCode: 200, body: JSON.stringify({ message: 'File processed successfully' }) });
+                // Save file temporarily and return URL
+                const tempPath = path.join('/tmp', file.originalFilename);
+                fs.writeFileSync(tempPath, fileContent);
+
+                // Serve the PDF file
+                resolve({
+                    statusCode: 200,
+                    body: JSON.stringify({ url: `/pdfs/${file.originalFilename}` })
+                });
             } catch (error) {
-                reject({ statusCode: 500, body: JSON.stringify({ error: 'Error reading file' }) });
+                reject({ statusCode: 500, body: JSON.stringify({ error: 'Error processing file' }) });
             }
         });
     });
