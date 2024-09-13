@@ -1,11 +1,3 @@
-{
-  "name": "pdf-to-bim",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "netlify dev"
-  },
-  "dependencies": {
-    "formidable": "^2.0.1"
-  }
+"scripts": {
+  "build": "mkdir -p dist && cp -r src/* dist/ && npm prune --production"
 }
