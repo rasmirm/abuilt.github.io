@@ -24,9 +24,6 @@
         #result {
             flex: 1;
         }
-        #hint-container {
-            margin-bottom: 20px;
-        }
         #uploadForm {
             margin-bottom: 20px;
         }
@@ -42,10 +39,6 @@
             <h2>Predictions</h2>
             <div id="predictions"></div>
         </div>
-    </div>
-    <div id="hint-container">
-        <h2>Enter Hint</h2>
-        <input type="text" id="hint-input" placeholder="Type your hint here" />
     </div>
     <form id="uploadForm" action="/.netlify/functions/classify" method="post" enctype="multipart/form-data">
         <input type="file" name="file" accept="image/*" />
@@ -72,4 +65,14 @@
             uploadedImage.src = imgURL;
             uploadedImage.style.display = 'block';
 
-            // Display predic
+            // Display predictions
+            let output = '<ul>';
+            predictions.forEach(pred => {
+                output += `<li>${pred.className}: ${pred.probability.toFixed(3)}</li>`;
+            });
+            output += '</ul>';
+            document.getElementById('predictions').innerHTML = output;
+        });
+    </script>
+</body>
+</html>
