@@ -1,11 +1,11 @@
 const { IncomingForm } = require('formidable');
 const fs = require('fs');
 const path = require('path');
-const tf = require('@tensorflow/tfjs-node');
-const mobilenet = require('@tensorflow-models/mobilenet');
+const sharp = require('sharp');
 
 exports.handler = async function(event, context) {
     const form = new IncomingForm();
+
     return new Promise((resolve, reject) => {
         form.parse(event, async (err, fields, files) => {
             if (err) {
@@ -15,15 +15,15 @@ exports.handler = async function(event, context) {
             const file = files.file[0];
             try {
                 const filePath = file.filepath;
-                const buffer = fs.readFileSync(filePath);
-                const image = tf.node.decodeImage(buffer);
-
-                const model = await mobilenet.load();
-                const predictions = await model.classify(image);
+                // Process image with sharp
+                const image = await sharp(filePath).metadata();
+                
+                // Placeholder prediction
+                const prediction = `Image dimensions: ${image.width}x${image.height}`;
 
                 resolve({
                     statusCode: 200,
-                    body: JSON.stringify({ predictions })
+                    body: JSON.stringify({ prediction })
                 });
             } catch (error) {
                 reject({ statusCode: 500, body: JSON.stringify({ error: 'Error processing image' }) });
