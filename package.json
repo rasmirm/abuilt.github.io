@@ -1,12 +1,14 @@
 {
   "name": "netlify-function",
   "version": "1.0.0",
-  "description": "Minimal Netlify function",
+  "description": "Minimal Netlify function with TensorFlow.js",
   "main": "classify.js",
   "scripts": {
     "start": "netlify dev"
   },
   "dependencies": {
-    "formidable": "^2.0.1"
+    "formidable": "^2.0.1",
+    "@tensorflow/tfjs-node": "^3.8.0",
+    "@tensorflow-models/mobilenet": "^2.0.0"
   }
 }
