@@ -3,61 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Upload</title>
-    <script src="https://unpkg.com/pdfjs-dist/build/pdf.min.js"></script>
-    <style>
-        #pdf-container {
-            position: relative;
-        }
-        .highlight {
-            background-color: yellow;
-        }
-    </style>
+    <title>Image Upload and Classification</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 </head>
 <body>
-    <h1>Upload PDF and Highlight Text</h1>
-    <form id="uploadForm" action="/.netlify/functions/upload" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".pdf" />
-        <button type="submit">Upload PDF</button>
+    <h1>Upload Image for Classification</h1>
+    <form id="uploadForm">
+        <input type="file" id="imageInput" accept="image/*" />
+        <button type="button" id="uploadButton">Upload Image</button>
     </form>
-    <div id="pdf-container"></div>
+    <div id="result"></div>
 
     <script>
-        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const response = await fetch(this.action, {
-                method: 'POST',
-                body: formData
-            });
+        document.getElementById('uploadButton').addEventListener('click', async function() {
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
 
-            const result = await response.json();
-            const pdfUrl = result.url;
+            if (!file) {
+                alert('Please select an image.');
+                return;
+            }
 
-            // Load and render PDF
-            const loadingTask = pdfjsLib.getDocument(pdfUrl);
-            loadingTask.promise.then(function(pdf) {
-                pdf.getPage(1).then(function(page) {
-                    const scale = 1.5;
-                    const viewport = page.getViewport({ scale: scale });
-                    const canvas = document.createElement('canvas');
-                    const context = canvas.getContext('2d');
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-                    document.getElementById('pdf-container').appendChild(canvas);
-
-                    const renderContext = {
-                        canvasContext: context,
-                        viewport: viewport
-                    };
-                    page.render(renderContext).promise.then(function() {
-                        console.log('Page rendered');
-                        // Add code here to highlight text
-                    });
-                });
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
-            });
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.onload = async function() {
+                const model = await mobilenet.load();
+                const predictions = await model.classify(img);
+                document.getElementById('result').innerHTML = `
+                    <h2>Predictions:</h2>
+                    <ul>
+                        ${predictions.map(p => `<li>${p.className}: ${p.probability.toFixed(2)}</li>`).join('')}
+                    </ul>
+                `;
+            };
         });
     </script>
 </body>
