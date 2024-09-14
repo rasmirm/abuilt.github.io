@@ -1,7 +1,5 @@
 {
   "name": "ai-image-predictor",
   "version": "1.0.0",
-  "dependencies": {
-    "@tensorflow/tfjs": "^4.0.0" // Include this if using TensorFlow.js for predictions
-  }
+  "dependencies": {"@tensorflow/tfjs": "^4.0.0"}
 }
