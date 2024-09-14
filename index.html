@@ -1,90 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Image Predictor</title>
-    <style>
-        body {
-            background-color: white;
-            font-family: 'Courier New', Courier, monospace;
-            color: black;
-            text-align: center;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 50vh;
-            width: 50vh;
-            position: relative;
-        }
-
-        #image-preview {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        #image-preview img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain; /* Ensures the image fits well */
-        }
-
-        input {
-            margin: 10px;
-        }
-
-        h1, h2 {
-            margin: 10px 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Image Predictor</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: white;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #image-box {
+      width: 50vw;
+      height: 50vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    #image-box img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    #prediction {
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
-    <h1>AI Image Predictor</h1>
-    <p>Upload an image or take a picture with your camera.</p>
-
-    <input type="file" id="fileInput" accept="image/*" capture="camera">
-    
-    <div class="container">
-        <div id="image-preview"></div>
+  <div id="container">
+    <input type="file" accept="image/*" id="file-input" />
+    <input type="file" accept="image/*" id="camera-input" capture="environment" />
+    <div id="image-box">
+      <img id="uploaded-image" src="" alt="" />
     </div>
+    <div id="prediction"></div>
+  </div>
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const cameraInput = document.getElementById('camera-input');
+    const uploadedImage = document.getElementById('uploaded-image');
+    const prediction = document.getElementById('prediction');
 
-    <button onclick="predictImage()">Predict Image</button>
-    
-    <h2>Prediction: <span id="prediction-result">---</span></h2>
+    async function uploadImage(imageFile) {
+      const formData = new FormData();
+      formData.append('file', imageFile);
 
-    <script>
-        function submitForm() {
-            const fileInput = document.getElementById('fileInput');
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-    
-            fetch('/.netlify/functions/predict', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const predictions = data.predictions;
-                document.getElementById('prediction-result').textContent = predictions.map(p => `${p.className}: ${p.probability.toFixed(4)}`).join(', ');
-            })
-            .catch(error => {
-                document.getElementById('prediction-result').textContent = 'Error occurred';
-            });
-        }
-    </script>
+      const response = await fetch('/.netlify/functions/predict', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+      prediction.innerText = `Prediction: ${result.prediction}`;
+    }
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          uploadedImage.src = event.target.result;
+          uploadImage(file);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    cameraInput.addEventListener('change', () => {
+      const file = cameraInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          uploadedImage.src = event.target.result;
+          uploadImage(file);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
 </body>
 </html>
