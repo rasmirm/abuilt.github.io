@@ -1,50 +1,36 @@
-const tf = require('@tensorflow/tfjs-node');
-const jpeg = require('jpeg-js');
+const { Image, createCanvas } = require('canvas'); // Use 'canvas' for image processing
 
-async function loadModel() {
-  // Load a pre-trained model (for example, a MobileNet model)
-  const model = await tf.loadLayersModel(
-    'https://storage.googleapis.com/tfjs-models/tfjs/mobilenet_v1_0.25_224/model.json'
-  );
-  return model;
-}
-
-function decodeImage(base64Image) {
-  const imageBuffer = Buffer.from(base64Image, 'base64');
-  const pixels = jpeg.decode(imageBuffer, true);
-  const { width, height, data } = pixels;
-  const numChannels = 3; // RGB
-  const numPixels = width * height;
-  const values = new Float32Array(numPixels * numChannels);
-
-  for (let i = 0; i < numPixels; i++) {
-    for (let c = 0; c < numChannels; c++) {
-      values[i * numChannels + c] = data[i * 4 + c] / 255;
-    }
+exports.handler = async (event, context) => {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method Not Allowed' })
+    };
   }
-  return tf.tensor3d(values, [height, width, numChannels]);
-}
-
-exports.handler = async function (event, context) {
-  const { image } = JSON.parse(event.body);
 
   try {
-    const base64Image = image.split(';base64,').pop();
-    const imgTensor = decodeImage(base64Image);
+    const formData = new URLSearchParams(event.body);
+    const imageFile = formData.get('file'); // This needs proper handling of image data
 
-    const model = await loadModel();
+    // Load image and perform prediction
+    const image = new Image();
+    image.src = Buffer.from(imageFile, 'base64');
 
-    const prediction = model.predict(imgTensor.expandDims(0));
-    const predictionData = prediction.dataSync();
+    const canvas = createCanvas(500, 500); // Adjust as necessary
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    // Perform prediction here
+    // const prediction = await predict(canvas); // Add your prediction logic here
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ prediction: predictionData }),
+      body: JSON.stringify({ prediction: 'example prediction' }) // Replace with actual prediction
     };
   } catch (error) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Prediction failed', details: error.message }),
+      body: JSON.stringify({ error: 'Internal Server Error' })
     };
   }
 };
