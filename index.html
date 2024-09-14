@@ -26,7 +26,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      background: #f0f0f0; /* Add background color to visualize the box */
+      background: #f0f0f0;
     }
     #image-box img {
       max-width: 100%;
@@ -55,13 +55,18 @@
       const formData = new FormData();
       formData.append('file', imageFile);
 
-      const response = await fetch('/.netlify/functions/predict', {
-        method: 'POST',
-        body: formData
-      });
+      try {
+        const response = await fetch('/.netlify/functions/predict', {
+          method: 'POST',
+          body: formData
+        });
 
-      const result = await response.json();
-      prediction.innerText = `Prediction: ${result.prediction || 'Error in prediction'}`;
+        const result = await response.json();
+        prediction.innerText = `Prediction: ${result.prediction || 'Error in prediction'}`;
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        prediction.innerText = 'Error uploading image';
+      }
     }
 
     fileInput.addEventListener('change', () => {
