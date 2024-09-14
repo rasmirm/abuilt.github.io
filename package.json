@@ -1,5 +1,8 @@
 {
   "name": "ai-image-predictor",
   "version": "1.0.0",
-  "dependencies": {"@tensorflow/tfjs": "^4.0.0"}
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.0.0", // Example dependency
+    "canvas": "^2.8.0" // Add the 'canvas' dependency here
+  }
 }
