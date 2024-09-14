@@ -1,13 +1,7 @@
 {
-  "name": "netlify-aiml-app",
+  "name": "ai-image-predictor",
   "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
   "dependencies": {
-    "@tensorflow/tfjs-node": "^3.14.0",
-    "jpeg-js": "^0.4.2"
-  },
-  "scripts": {
-    "build": "netlify-lambda build functions"
+    "@tensorflow/tfjs": "^4.0.0" // Include this if using TensorFlow.js for predictions
   }
 }
