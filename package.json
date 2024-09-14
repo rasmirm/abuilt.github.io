@@ -1,8 +1,13 @@
 {
+  "name": "netlify-aiml-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
   "dependencies": {
     "@tensorflow/tfjs-node": "^3.14.0",
-    "@tensorflow-models/mobilenet": "^2.1.0",
-    "formidable": "^2.0.1",
-    "image-js": "^0.30.0"
+    "jpeg-js": "^0.4.2"
+  },
+  "scripts": {
+    "build": "netlify-lambda build functions"
   }
 }
