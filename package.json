@@ -1,13 +1,13 @@
 {
-  "name": "netlify-function",
+  "name": "netlify-aiml-app",
   "version": "1.0.0",
-  "description": "Minimal Netlify function with sharp",
-  "main": "classify.js",
-  "scripts": {
-    "start": "netlify dev"
-  },
+  "main": "index.js",
+  "license": "MIT",
   "dependencies": {
-    "formidable": "^2.0.1",
-    "sharp": "^0.30.0"  // Ensure you use a compatible version
+    "@tensorflow/tfjs-node": "^3.14.0",
+    "jpeg-js": "^0.4.2"
+  },
+  "scripts": {
+    "build": "netlify-lambda build functions"
   }
 }
