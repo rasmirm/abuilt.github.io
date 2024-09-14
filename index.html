@@ -26,6 +26,7 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      background: #f0f0f0; /* Add background color to visualize the box */
     }
     #image-box img {
       max-width: 100%;
@@ -39,8 +40,7 @@
 </head>
 <body>
   <div id="container">
-    <input type="file" accept="image/*" id="file-input" />
-    <input type="file" accept="image/*" id="camera-input" capture="environment" />
+    <input type="file" accept="image/*" id="file-input" capture="environment" />
     <div id="image-box">
       <img id="uploaded-image" src="" alt="" />
     </div>
@@ -48,7 +48,6 @@
   </div>
   <script>
     const fileInput = document.getElementById('file-input');
-    const cameraInput = document.getElementById('camera-input');
     const uploadedImage = document.getElementById('uploaded-image');
     const prediction = document.getElementById('prediction');
 
@@ -62,23 +61,11 @@
       });
 
       const result = await response.json();
-      prediction.innerText = `Prediction: ${result.prediction}`;
+      prediction.innerText = `Prediction: ${result.prediction || 'Error in prediction'}`;
     }
 
     fileInput.addEventListener('change', () => {
       const file = fileInput.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          uploadedImage.src = event.target.result;
-          uploadImage(file);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    cameraInput.addEventListener('change', () => {
-      const file = cameraInput.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (event) => {
