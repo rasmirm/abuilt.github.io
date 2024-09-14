@@ -1,4 +1,4 @@
-const { createCanvas, loadImage } = require('canvas'); // Make sure to use 'canvas' for image handling
+const { createCanvas, loadImage } = require('canvas'); // Ensure 'canvas' is properly installed
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -9,9 +9,10 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Parse form data
     const formData = new URLSearchParams(event.body);
     const imageFile = formData.get('file');
-
+    
     if (!imageFile) {
       return {
         statusCode: 400,
@@ -19,19 +20,21 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Decode base64 image data
     const imageBuffer = Buffer.from(imageFile.replace(/^data:image\/\w+;base64,/, ""), 'base64');
     const image = await loadImage(imageBuffer);
 
+    // Create a canvas and draw the image
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-    // Perform prediction here
-    // const prediction = await predict(canvas); // Add your prediction logic here
+    // Placeholder for your prediction logic
+    const prediction = 'example prediction'; // Replace with actual prediction logic
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ prediction: 'example prediction' }) // Replace with actual prediction
+      body: JSON.stringify({ prediction })
     };
   } catch (error) {
     console.error('Error during prediction:', error);
