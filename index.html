@@ -67,45 +67,22 @@
     <h2>Prediction: <span id="prediction-result">---</span></h2>
 
     <script>
-        const fileInput = document.getElementById('fileInput');
-        const imagePreview = document.getElementById('image-preview');
-        const predictionResult = document.getElementById('prediction-result');
-        
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.id = 'uploaded-image';
-                    imagePreview.innerHTML = ''; // Clear previous image
-                    imagePreview.appendChild(img);
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        function predictImage() {
-            const uploadedImage = document.getElementById('uploaded-image');
-            if (!uploadedImage) {
-                alert('Please upload an image first.');
-                return;
-            }
-            
-            // Call the backend to predict
-            fetch('/predict', {
+        function submitForm() {
+            const fileInput = document.getElementById('fileInput');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+    
+            fetch('/.netlify/functions/predict', {
                 method: 'POST',
-                body: JSON.stringify({ image: uploadedImage.src }),
-                headers: { 'Content-Type': 'application/json' }
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
-                predictionResult.textContent = data.prediction;
+                const predictions = data.predictions;
+                document.getElementById('prediction-result').textContent = predictions.map(p => `${p.className}: ${p.probability.toFixed(4)}`).join(', ');
             })
             .catch(error => {
-                console.error('Error predicting image:', error);
-                predictionResult.textContent = 'Error occurred';
+                document.getElementById('prediction-result').textContent = 'Error occurred';
             });
         }
     </script>
