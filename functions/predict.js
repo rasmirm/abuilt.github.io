@@ -1,4 +1,4 @@
-const { Image, createCanvas } = require('canvas'); // Use 'canvas' for image processing
+const { createCanvas, loadImage } = require('canvas'); // Make sure to use 'canvas' for image handling
 
 exports.handler = async (event, context) => {
   if (event.httpMethod !== 'POST') {
@@ -10,13 +10,19 @@ exports.handler = async (event, context) => {
 
   try {
     const formData = new URLSearchParams(event.body);
-    const imageFile = formData.get('file'); // This needs proper handling of image data
+    const imageFile = formData.get('file');
 
-    // Load image and perform prediction
-    const image = new Image();
-    image.src = Buffer.from(imageFile, 'base64');
+    if (!imageFile) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'No file uploaded' })
+      };
+    }
 
-    const canvas = createCanvas(500, 500); // Adjust as necessary
+    const imageBuffer = Buffer.from(imageFile.replace(/^data:image\/\w+;base64,/, ""), 'base64');
+    const image = await loadImage(imageBuffer);
+
+    const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
@@ -28,6 +34,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ prediction: 'example prediction' }) // Replace with actual prediction
     };
   } catch (error) {
+    console.error('Error during prediction:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Internal Server Error' })
